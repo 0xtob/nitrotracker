@@ -49,7 +49,7 @@ You should now have three directories:
   * */home/miyamoto/code/dsdev/libntxm*
   * */home/miyamoto/code/dsdev/nitrotracker*
 
-The Makefiles of NitroTracker are configured such that when you compile NitroTracker, libdsmi and libntxm are compiled as well. So, a single "make" call will compile everything at once, and if you make updates to NitroTracker or any of its dependencies, this single "make" call will compile the updated libraries and re-link NitroTracker if necessary.
+The Makefiles of NitroTracker are configured such that when you compile NitroTracker, libdsmi and libntxm are compiled as well. So, a single *make* call will compile everything at once, and if you make updates to any of libraries, this single *make* call will compile the updated libraries and re-link NitroTracker.
 
 To set up the build system, all you need to do is to specify the locations of libntxm and libdsmi in environment variables. The easiest way to do this is to declare these variables in your .bashrc:
 
