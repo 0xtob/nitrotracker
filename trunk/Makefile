@@ -15,9 +15,6 @@ ifeq ($(strip $(LIBNTXM)),)
 $(error "Please set LIBNTXM in your environment. export LIBNTXM=<path to>libntxm")
 endif
 
-# Custom targets for copying stuff to the DS
--include mytargets.mk
-
 export TARGET		:=	$(shell basename $(CURDIR))
 export TOPDIR		:=	$(CURDIR)
 
@@ -27,6 +24,9 @@ export TOPDIR		:=	$(CURDIR)
 export PATH		:=	$(DEVKITARM)/bin:$(PATH)
 
 .PHONY: libdsmi libntxm tobkit $(TARGET).arm7 $(TARGET).arm9
+
+# Custom targets for copying stuff to the DS
+-include mytargets.mk
 
 #---------------------------------------------------------------------------------
 # main targets
