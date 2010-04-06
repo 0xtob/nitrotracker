@@ -2,7 +2,14 @@
 
 == 1. Set up the devkitPro toolchain ==
 
-In order to develop anything for the Nintendo DS, you need the devkitPro cross-compilation toolchain. Please follow the [http://wiki.devkitpro.org/index.php/Getting_Started/devkitARM installation instructions] on the [http://www.devkitpro.org/ devkitPro webpage].
+In order to develop anything for the Nintendo DS, you need the devkitPro cross-compilation toolchain. Please follow the [http://wiki.devkitpro.org/index.php/Getting_Started/devkitARM installation instructions] on the [http://www.devkitpro.org/ devkitPro webpage]. Yes, you do need all those libraries, except for maxmod and libfilesystem.
+
+Since some updates of the devkitPro libraries have API changes, here's a list of the latest library versions tested to work with NitroTracker:
+
+  * devkitARM r30
+  * libnds 1.4.3
+  * dswifi 0.3.12
+  * libfat 1.0.7
 
 == 2. Get required libraries ==
 
