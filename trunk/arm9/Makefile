@@ -5,6 +5,14 @@ ifeq ($(strip $(DEVKITARM)),)
 $(error "Please set DEVKITARM in your environment. export DEVKITARM=<path to>devkitARM")
 endif
 
+ifeq ($(strip $(LIBDSMI)),)
+$(error "Please set LIBDSMI in your environment. export LIBDSMI=<path to>libdsmi")
+endif
+
+ifeq ($(strip $(LIBNTXM)),)
+$(error "Please set LIBNTXM in your environment. export LIBNTXM=<path to>libntxm")
+endif
+
 include $(DEVKITARM)/ds_rules
 
 #---------------------------------------------------------------------------------
@@ -49,7 +57,7 @@ LIBS	:= -ltobkit -lntxm9 -ldsmi -ldswifi9 -lfat -lnds9
 # list of directories containing libraries, this must be the top level containing
 # include and lib
 #---------------------------------------------------------------------------------
-LIBDIRS	:= /home/tob/coding/dsdev/tob/dsmi/dsmi/ds/libdsmi/ /home/tob/coding/dsdev/tob/libntxm/libntxm/libntxm $(PWD)/tobkit $(LIBNDS)
+LIBDIRS	:= $(LIBDSMI) $(LIBNTXM) $(PWD)/tobkit $(LIBNDS)
 
 #---------------------------------------------------------------------------------
 # no real need to edit anything past this point unless you need to add additional
