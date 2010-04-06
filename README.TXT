@@ -29,6 +29,34 @@ You will probably need it. It's on the ...
 
     http://modarchive.org/forums/index.php?board=79.0
 
+-- I want *you* for NitroTracker!
+
+What you can do:
+
+    Beta test!
+
+        Beta testers get access to early versions of the tracker
+        in exchange for constructive criticism. If you want to
+        be a beta tester, send an e-mail to me@nitrotracker.tobw.net
+
+    Find bugs and request features!
+
+        Bug reports and feature requests are collected here:
+
+        http://code.google.com/p/nitrotracker/issues/list
+
+        If you have something that isn't already on that list, feel
+        free to add it.
+
+    Become a NitroTracker developer!
+
+        The source and all the info on how to get started is here:
+
+        http://code.google.com/p/nitrotracker/
+
+        If you want to contribute a patch or even become a regular
+        developer, just drop an e-mail to me@nitrotracker.tobw.net .
+
 -- Contact
 
 Get in touch with other NitroTracker users in the official
