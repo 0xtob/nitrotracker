@@ -58,7 +58,7 @@ export LIBDSMI=/home/miyamoto/code/dsdev/dsmi/ds/libdsmi/
 export LIBNTXM=/home/miyamoto/code/dsdev/libntxm/libntxm/
 }}}
 
-Beware that libdsmi is in the subdirectory ds/libdsmi/ of the dsmi project and libntxm is in the libntxm subfolder of the libntxm project.
+Beware that *libdsmi* is in the subdirectory *ds/libdsmi/* of the *dsmi* project and *libntxm* is in the *libntxm* subfolder of the *libntxm* project.
 
 Now, a simple
 
@@ -67,7 +67,7 @@ cd nitrotracker
 make
 }}}
 
-should compile everything and leave you with a nice nitrotracker.nds
+should compile everything and leave you with a nice *nitrotracker.nds*
 
 == 4. DLDI (optional) ==
 
@@ -86,7 +86,7 @@ But as I said, better not use them.
 
 == 6. Defining custom Makefile targets ==
 
-You can create custom targets for DLDI patching, copying to flashcards, or running in an emulator. In order to do this, please do not edit the main Makefile (because then settings that only apply to you would be committed to the repository). Instead, create a file called *mytargets.mk* in the NitroTracker directory. This file in included in the main Makefile, so targets you add there are available when building. Here's an example target for DLDI patching and copying to a GBAMP:
+You can create custom targets for DLDI patching, copying to flashcards, or running in an emulator. In order to do this, please do *not* edit the main Makefile (because then settings that only apply to you would be committed to the repository). Instead, create a file called *mytargets.mk* in the NitroTracker directory. If it exists, this file is included in the main Makefile, so targets you add there are available when building. Here's an example target for DLDI patching and copying to a GBAMP:
 
 {{{
 cp: $(TARGET).nds
