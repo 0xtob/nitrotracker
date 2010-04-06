@@ -10,12 +10,15 @@ include $(DEVKITARM)/ds_rules
 export TARGET		:=	$(shell basename $(CURDIR))
 export TOPDIR		:=	$(CURDIR)
 
+LIBNTXM     := ~/coding/dsdev/tob/libntxm/libntxm/libntxm
+LIBDSMI     := ~/coding/dsdev/tob/dsmi/dsmi/ds/libdsmi
+
 #---------------------------------------------------------------------------------
 # path to tools - this can be deleted if you set the path in windows
 #---------------------------------------------------------------------------------
 export PATH		:=	$(DEVKITARM)/bin:$(PATH)
 
-.PHONY: libntxm tobkit $(TARGET).arm7 $(TARGET).arm9
+.PHONY: libdsmi libntxm tobkit $(TARGET).arm7 $(TARGET).arm9
 
 #---------------------------------------------------------------------------------
 # main targets
@@ -23,10 +26,13 @@ export PATH		:=	$(DEVKITARM)/bin:$(PATH)
 all: $(TARGET).ds.gba $(TARGET).gba.nds
 
 libntxm:
-	@make -C ~/coding/dsdev/tob/libntxm/libntxm/libntxm
+	@make -C $(LIBNTXM)
 
 tobkit:
 	@make -C tobkit
+
+libdsmi:
+	@make -C $(LIBDSMI)
 
 debug: $(TARGET).dbg.nds
 
@@ -66,7 +72,7 @@ $(TARGET).gba.nds: $(TARGET).nds
 	cat ndsloader.bin $(TARGET).nds > $(TARGET).gba.nds
 
 #---------------------------------------------------------------------------------
-$(TARGET).nds	:	libntxm tobkit $(TARGET).arm7 $(TARGET).arm9
+$(TARGET).nds	:	libdsmi libntxm tobkit $(TARGET).arm7 $(TARGET).arm9
 	ndstool -c $(TARGET).nds -7 $(TARGET).arm7 -9 $(TARGET).arm9 -b icon.bmp "NitroTracker"
 
 #---------------------------------------------------------------------------------
