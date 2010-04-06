@@ -15,6 +15,9 @@ ifeq ($(strip $(LIBNTXM)),)
 $(error "Please set LIBNTXM in your environment. export LIBNTXM=<path to>libntxm")
 endif
 
+# Custom targets for copying stuff to the DS
+-include mytargets.mk
+
 export TARGET		:=	$(shell basename $(CURDIR))
 export TOPDIR		:=	$(CURDIR)
 
@@ -38,29 +41,6 @@ tobkit:
 
 libdsmi:
 	@make -C $(LIBDSMI)
-
-debug: $(TARGET).dbg.nds
-
-cp: all
-	dlditool $(DLDIPATH)/mpcf.dldi $(TARGET).nds
-	cp $(TARGET).nds /media/GBAMP/NitroTracker.nds
-	pumount /media/GBAMP
-
-r4: all
-	dlditool $(DLDIPATH)/r4tf.dldi $(TARGET).nds
-	cp $(TARGET).nds /media/R4
-	pumount /media/R4
-
-scl: all
-	dlditool $(DLDIPATH)/sclt.dldi $(TARGET).nds
-	cp $(TARGET).nds /media/MICROSD
-	pumount /media/MICROSD
-
-#fcsr:
-#	~/coding/dsdev/tools/fcsr/build.sh nt.img wav
-#	padbin 512 $(TARGET).ds.gba
-#	cat $(TARGET).ds.gba nt.img > $(TARGET)_fcsr.ds.gba
-#	dlditool ~/coding/dsdev/tools/dldi/fcsr.dldi $(TARGET)_fcsr.ds.gba
 
 $(TARGET).ds.gba	: $(TARGET).nds
 	
