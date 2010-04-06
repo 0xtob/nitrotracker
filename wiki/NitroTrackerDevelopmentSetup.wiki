@@ -1,7 +1,5 @@
 #summary How to set up the toolchain and libraries required for compiling NitroTracker
 
-= How to set up the toolchain and libraries required for compiling NitroTracker =
-
 == 1. Set up the devkitPro toolchain ==
 
 In order to develop anything for the Nintendo DS, you need the devkitPro cross-compilation toolchain. Please follow the [http://wiki.devkitpro.org/index.php/Getting_Started/devkitARM installation instructions] on the [http://www.devkitpro.org/ devkitPro webpage].
@@ -68,11 +66,24 @@ Testing NitroTracker on your DS requires patching with a [http://chishm.drunkenc
 
 == 4. Emulators (optional) ==
 
+DS Emulators suck! Really, just don't trust them. Things that work on the hardware will not work on emulators. Things that work on emulators will not work on the hardware. When you test your DS software using only emulators, you're doomed!
+
+That said, if you're cautious, emulators can be useful for quick tests. But remember to repeat your tests on hardware once in a while. Emulators I can recommend are:
+
+  * [http://nocash.emubase.de/gba.htm no$gba] (Windows, but works great in Wine)
+  * [http://desmume.org/ DeSmuME] (Windows, Linux, OSX)
+
+But as I said, better not use them.
+
 == 5. Defining custom Makefile targets ==
 
-= Details =
+You can create custom targets for DLDI patching, copying to flashcards, or running in an emulator. In order to do this, please do not edit the main Makefile (because then settings that only apply to you would be committed to the repository). Instead, create a file called *mytargets.mk* in the NitroTracker directory. This file in included in the main Makefile, so targets you add there are available when building. Here's an example target for DLDI patching and copying to a GBAMP:
 
-Add your content here.  Format your content with:
-  * Text in *bold* or _italic_
-  * Headings, paragraphs, and lists
-  * Automatic links to other wiki pages
+{{{
+cp: $(TARGET).nds
+    dlditool $(DLDIPATH)/mpcf.dldi $(TARGET).nds
+    cp $(TARGET).nds /media/GBAMP/$(TARGET).nds
+    pumount /media/GBAMP
+}}}
+
+As you can see this target also unmounts the CF card, so I can just do "make cp", pull out the flashcard and put it into my DS.
