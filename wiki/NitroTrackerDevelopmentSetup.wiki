@@ -13,9 +13,11 @@ Since some updates of the devkitPro libraries have API changes, here's a list of
 
 == 2. Get required libraries ==
 
-I recommend putting all your DS development stuff (except for devkitPro) in a directory under your home directory, e.g. */home/miyamoto/code/dsdev/*.
+But first a word on source code management systems: I don't really like SVN, but I love git! For NitroTracker, I recommend using git-svn. There's instructions on how to get a Google Code SVN project as a git-svn project [http://google-opensource.blogspot.com/2008/05/develop-with-git-on-google-code-project.html here].
 
-A word on source code management systems: I don't really like SVN, but I love git! For NitroTracker, I recommend using git-svn. There's instructions on how to get a Google Code SVN project as a git-svn project [http://google-opensource.blogspot.com/2008/05/develop-with-git-on-google-code-project.html here].
+I recommend putting all your DS development stuff (except for devkitPro) in a directory under your home directory, e.g.
+
+*/home/miyamoto/code/dsdev/*.
 
 === 2.1 libntxm ===
 
