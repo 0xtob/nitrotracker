@@ -1,0 +1,78 @@
+#summary How to set up the toolchain and libraries required for compiling NitroTracker
+
+= How to set up the toolchain and libraries required for compiling NitroTracker =
+
+== 1. Set up the devkitPro toolchain ==
+
+In order to develop anything for the Nintendo DS, you need the devkitPro cross-compilation toolchain. Please follow the [http://wiki.devkitpro.org/index.php/Getting_Started/devkitARM installation instructions] on the [http://www.devkitpro.org/ devkitPro webpage].
+
+== 2. Get required libraries ==
+
+I recommend putting all your DS development stuff (except for devkitPro) in a directory under your home directory, e.g. */home/miyamoto/code/dsdev/*.
+
+A word on source code management systems: I don't really like SVN, but I love git! For NitroTracker, I recommend using git-svn. There's instructions on how to get a Google Code SVN project as a git-svn project [http://google-opensource.blogspot.com/2008/05/develop-with-git-on-google-code-project.html here].
+
+=== 2.1 libntxm ===
+
+[http://code.google.com/p/libntxm libntxm] is the heart of NitroTracker: The XM player. So, in order to work on NitroTracker, you also need the SVN version of libntxm. Check out the source from the SVN:
+
+http://code.google.com/p/libntxm/source/checkout
+
+=== 2.2 libdsmi ===
+
+[http://dsmi.tobw.net DSMI] enables NitroTracker to send and receive MIDI via Wifi, enabling it to control synthesizer software on the PC, or letting some sequencer software on the PC trigger samples in NitroTracker. For libdsmi, it suffices if you download the latest release version from here:
+
+http://code.google.com/p/dsmi/downloads/list
+
+If you like the bleeding edge better, you can alternatively get the SVN version from:
+
+http://code.google.com/p/dsmi/source/checkout
+
+== Getting the NitroTracker source and setting it up ==
+
+As you might have guessed, you can get NitroTracker's source from here:
+
+http://code.google.com/p/nitrotracker/source/checkout
+
+Really, do use git-svn! Instructions are [http://google-opensource.blogspot.com/2008/05/develop-with-git-on-google-code-project.html here].
+
+You should now have three directories:
+
+  * */home/miyamoto/code/dsdev/dsmi*
+  * */home/miyamoto/code/dsdev/libntxm*
+  * */home/miyamoto/code/dsdev/nitrotracker*
+
+The Makefiles of NitroTracker are configured such that when you compile NitroTracker, libdsmi and libntxm are compiled as well. So, a single "make" call will compile everything at once, and if you make updates to NitroTracker or any of its dependencies, this single "make" call will compile the updated libraries and re-link NitroTracker if necessary.
+
+To set up the build system, all you need to do is to specify the locations of libntxm and libdsmi in environment variables. The easiest way to do this is to declare these variables in your .bashrc:
+
+{{{
+export LIBDSMI=/home/miyamoto/code/dsdev/dsmi/ds/libdsmi/
+export LIBNTXM=/home/miyamoto/code/dsdev/libntxm/libntxm/
+}}}
+
+Beware that libdsmi is in the subdirectory ds/libdsmi/ of the dsmi project and libntxm is in the libntxm subfolder of the libntxm project.
+
+Now, a simple
+
+{{{
+cd nitrotracker
+make
+}}}
+
+should compile everything and leave you with a nice nitrotracker.nds
+
+== 3. DLDI (optional) ==
+
+Testing NitroTracker on your DS requires patching with a [http://chishm.drunkencoders.com/DLDI/ DLDI] patch. This patcher adds support for your specific flashcard to an nds binary that uses libfat. Chances are your flashcart supports DLDI patching out of the box and you don't have to do anything to be able to access the file system. If this isn't the case, get a DLDI patcher for your OS and a patch for your flashcard from [http://dldi.drunkencoders.com here]. You can then add a custom Makefile target (see below) to do all the patching for you.
+
+== 4. Emulators (optional) ==
+
+== 5. Defining custom Makefile targets ==
+
+= Details =
+
+Add your content here.  Format your content with:
+  * Text in *bold* or _italic_
+  * Headings, paragraphs, and lists
+  * Automatic links to other wiki pages
