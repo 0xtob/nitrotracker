@@ -2,16 +2,21 @@
 .SUFFIXES:
 #---------------------------------------------------------------------------------
 ifeq ($(strip $(DEVKITARM)),)
-$(error "Please set DEVKITARM in your environment. export DEVKITARM=<path to>devkitARM)
+$(error "Please set DEVKITARM in your environment. export DEVKITARM=<path to>devkitARM")
 endif
 
 include $(DEVKITARM)/ds_rules
 
+ifeq ($(strip $(LIBDSMI)),)
+$(error "Please set LIBDSMI in your environment. export LIBDSMI=<path to>libdsmi")
+endif
+
+ifeq ($(strip $(LIBNTXM)),)
+$(error "Please set LIBNTXM in your environment. export LIBNTXM=<path to>libntxm")
+endif
+
 export TARGET		:=	$(shell basename $(CURDIR))
 export TOPDIR		:=	$(CURDIR)
-
-LIBNTXM     := ~/coding/dsdev/tob/libntxm/libntxm/libntxm
-LIBDSMI     := ~/coding/dsdev/tob/dsmi/dsmi/ds/libdsmi
 
 #---------------------------------------------------------------------------------
 # path to tools - this can be deleted if you set the path in windows
@@ -37,33 +42,25 @@ libdsmi:
 debug: $(TARGET).dbg.nds
 
 cp: all
-	dlditool ~/coding/dsdev/tools/dldi/mpcf.dldi $(TARGET).nds
+	dlditool $(DLDIPATH)/mpcf.dldi $(TARGET).nds
 	cp $(TARGET).nds /media/GBAMP/NitroTracker.nds
 	pumount /media/GBAMP
 
 r4: all
-	dlditool ~/coding/dsdev/tools/dldi/r4tf.dldi $(TARGET).nds
+	dlditool $(DLDIPATH)/r4tf.dldi $(TARGET).nds
 	cp $(TARGET).nds /media/R4
 	pumount /media/R4
 
-/media/DSX:
-	pmount /dev/sda /media/DSX
-
-dsx: all /media/DSX
-	dlditool ~/coding/dsdev/tools/dldi/dsx.dldi $(TARGET).nds
-	cp $(TARGET).nds /media/DSX
-	pumount /media/DSX
-
 scl: all
-	dlditool ~/coding/dsdev/tools/dldi/sclt.dldi $(TARGET).nds
+	dlditool $(DLDIPATH)/sclt.dldi $(TARGET).nds
 	cp $(TARGET).nds /media/MICROSD
 	pumount /media/MICROSD
 
-fcsr:
-	~/coding/dsdev/tools/fcsr/build.sh nt.img wav
-	padbin 512 $(TARGET).ds.gba
-	cat $(TARGET).ds.gba nt.img > $(TARGET)_fcsr.ds.gba
-	dlditool ~/coding/dsdev/tools/dldi/fcsr.dldi $(TARGET)_fcsr.ds.gba
+#fcsr:
+#	~/coding/dsdev/tools/fcsr/build.sh nt.img wav
+#	padbin 512 $(TARGET).ds.gba
+#	cat $(TARGET).ds.gba nt.img > $(TARGET)_fcsr.ds.gba
+#	dlditool ~/coding/dsdev/tools/dldi/fcsr.dldi $(TARGET)_fcsr.ds.gba
 
 $(TARGET).ds.gba	: $(TARGET).nds
 	
