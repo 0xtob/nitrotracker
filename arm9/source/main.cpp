@@ -95,7 +95,9 @@
 
 #include <fat.h>
 #include <libdsmi.h>
+#ifdef WIFIDEBUG
 #include <user_debugger.h>
+#endif
 #include <dswifi9.h>
 
 #define PEN_DOWN (~IPC->buttons & (1 << 6))
