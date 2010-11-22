@@ -22,6 +22,13 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#define DEBUG
+#define GURU // Show guru meditations
+//#define SPLASH
+//#define WIFIDEBUG
+#define WIFI
+#define USE_FAT
+
 #include <nds.h>
 #include <nds/arm9/console.h>
 #include <nds/arm9/sound.h>
@@ -90,13 +97,6 @@
 #include <libdsmi.h>
 #include <user_debugger.h>
 #include <dswifi9.h>
-
-#define DEBUG
-#define GURU // Show guru meditations
-//#define SPLASH
-//#define WIFIDEBUG
-#define WIFI
-#define USE_FAT
 
 #define PEN_DOWN (~IPC->buttons & (1 << 6))
 
