@@ -47,7 +47,7 @@ LIBS	:=	-lntxm7 -ldswifi7 -lnds7
 # list of directories containing libraries, this must be the top level containing
 # include and lib
 #---------------------------------------------------------------------------------
-LIBDIRS	:=	$(LIBNDS) /home/tob/coding/dsdev/tob/libntxm/svn/libntxm
+LIBDIRS	:=	$(LIBNDS) $(LIBNTXM)
  
   
 #---------------------------------------------------------------------------------
