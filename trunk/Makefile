@@ -25,9 +25,6 @@ export PATH		:=	$(DEVKITARM)/bin:$(PATH)
 
 .PHONY: libdsmi libntxm tobkit $(TARGET).arm7 $(TARGET).arm9
 
-# Custom targets for copying stuff to the DS
--include mytargets.mk
-
 #---------------------------------------------------------------------------------
 # main targets
 #---------------------------------------------------------------------------------
@@ -69,3 +66,7 @@ clean:
 	$(MAKE) -C arm9 clean
 	$(MAKE) -C arm7 clean
 	rm -f $(TARGET).ds.gba $(TARGET).nds $(TARGET).arm7 $(TARGET).arm9
+
+# Custom targets for copying stuff to the DS
+-include mytargets.mk
+
