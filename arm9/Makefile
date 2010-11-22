@@ -57,7 +57,7 @@ LIBS	:= -ltobkit -lntxm9 -ldsmi -ldswifi9 -lfat -lnds9
 # list of directories containing libraries, this must be the top level containing
 # include and lib
 #---------------------------------------------------------------------------------
-LIBDIRS	:= $(LIBDSMI) $(LIBNTXM) $(PWD)/tobkit $(LIBNDS)
+LIBDIRS	:= $(LIBDSMI) $(LIBNTXM) $(TOPDIR)/tobkit $(LIBNDS)
 
 #---------------------------------------------------------------------------------
 # no real need to edit anything past this point unless you need to add additional
