@@ -33,10 +33,11 @@
 
 /* ===================== PUBLIC ===================== */
 
-Settings::Settings(bool read)
+Settings::Settings(bool use_fat)
 : handedness(RIGHT_HANDED),
 sample_preview(true),
-theme(new Theme())
+theme(new Theme()),
+fat(use_fat)
 {
 	memset(songpath, 0, 255);
 	memset(samplepath, 0, 255);
@@ -44,7 +45,7 @@ theme(new Theme())
 	strcpy(songpath,"/");
 	strcpy(samplepath,"/");
 
-	if(read == true)
+	if(fat == true)
 	{
 		// Check if the config file exists and, if not, create it
 		if(!diropen("/data"))
@@ -115,7 +116,9 @@ Handedness Settings::getHandedness(void)
 void Settings::setHandedness(Handedness handedness_)
 {
 	handedness = handedness_;
-	write();
+    if(fat) {
+    	write();
+    }
 }
 
 bool Settings::getSamplePreview(void)
@@ -126,7 +129,9 @@ bool Settings::getSamplePreview(void)
 void Settings::setSamplePreview(bool sample_preview_)
 {
 	sample_preview =  sample_preview_;
-	write();
+    if(fat) {
+    	write();
+    }
 }
 
 Theme *Settings::getTheme(void)
@@ -137,7 +142,9 @@ Theme *Settings::getTheme(void)
 void Settings::setTheme(Theme *theme_)
 {
 	theme = theme_;
-	write();
+    if(fat) {
+    	write();
+    }
 }
 
 char *Settings::getSongPath(void)
@@ -149,7 +156,9 @@ void Settings::setSongPath(const char* songpath_)
 {
 	strncpy(songpath, songpath_, 255);
 	songpath[min(255, strlen(songpath_))] = 0;
-	write();
+    if(fat) {
+    	write();
+    }
 }
 
 char *Settings::getSamplePath(void)
@@ -161,7 +170,9 @@ void Settings::setSamplePath(const char* samplepath_)
 {
 	strncpy(samplepath, samplepath_, 255);
 	samplepath[min(255, strlen(samplepath_))] = 0;
-	write();
+    if(fat) {
+    	write();
+    }
 }
 
 /* ===================== PRIVATE ===================== */
