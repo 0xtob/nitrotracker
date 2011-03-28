@@ -149,7 +149,10 @@ void Settings::setTheme(Theme *theme_)
 
 char *Settings::getSongPath(void)
 {
-	return songpath;
+    if(!diropen(songpath)) {
+        strcpy(songpath, "/");
+    }
+    return songpath;
 }
 
 void Settings::setSongPath(const char* songpath_)
@@ -163,6 +166,9 @@ void Settings::setSongPath(const char* songpath_)
 
 char *Settings::getSamplePath(void)
 {
+    if(!diropen(samplepath)) {
+        strcpy(samplepath, "/");
+    }
 	return samplepath;
 }
 
