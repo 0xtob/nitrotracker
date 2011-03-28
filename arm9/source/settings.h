@@ -35,7 +35,7 @@ enum Handedness {LEFT_HANDED, RIGHT_HANDED};
 
 class Settings {
 	public:
-		Settings(bool read=true);
+		Settings(bool use_fat=true);
 		void read(void);
 
 		Handedness getHandedness(void);
@@ -69,6 +69,7 @@ class Settings {
 		Theme *theme;
 		char songpath[256];
 		char samplepath[256];
+        bool fat;
 };
 
 #endif
