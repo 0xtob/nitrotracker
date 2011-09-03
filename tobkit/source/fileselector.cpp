@@ -200,46 +200,51 @@ void FileSelector::read_directory(void)
 	//iprintf("%d\n", __LINE__);
 	char *filename = (char*)malloc(PATH_MAX);
 
-	DIR_ITER *dir;
+	DIR *dir;
 	struct stat filestats;
 	//iprintf("%d\n", __LINE__);
-	if((dir = diropen(current_directory.c_str())) == NULL)
+	if((dir = opendir(current_directory.c_str())) == NULL)
 	{
 		iprintf("Dir read error!\n");
 		return;
 	}
 	//iprintf("%d\n", __LINE__);
-	int find_result = dirnext(dir, filename, &filestats);
+	struct dirent *direntry = readdir(dir);
 
-	if(find_result == -1)
+	if(direntry == NULL)
 	{
 		iprintf("No files found!\n");
 		return;
 	}
 	//iprintf("%d\n", __LINE__);
-	while(find_result != -1)
+	while(direntry != NULL)
 	{
-		if(filename[0] != '.') { // Hidden and boring files
+		if(direntry->d_name[0] != '.') { // Hidden and boring files
 
 			File newfile;
-			newfile.name = filename;
-			newfile.name_with_path = current_directory + filename;
-			if(filestats.st_mode & S_IFDIR)
+			newfile.name = direntry->d_name;
+			newfile.name_with_path = current_directory + direntry->d_name;
+			if(direntry->d_type & DT_DIR)
 				newfile.is_dir = true;
 			else
 				newfile.is_dir = false;
-
-			newfile.size = filestats.st_size;
+            
+            if(!newfile.is_dir) {
+                int stat_res = stat(newfile.name_with_path.c_str(), &filestats);
+                if(stat_res != -1) {
+        			newfile.size = filestats.st_size;
+                }
+            }
 			//iprintf("%d\n", __LINE__);
 			filelist.push_back(newfile);
 			//iprintf("%d\n", __LINE__);
 		}
 		//iprintf("%d\n", __LINE__);
-		find_result = dirnext(dir, filename, &filestats);
+		direntry = readdir(dir);
 		//iprintf("%d\n", __LINE__);
 	}
 
-	dirclose(dir);
+	closedir(dir);
 	free(filename);
 	//iprintf("%d\n", __LINE__);
 	// Apply filter if there is one

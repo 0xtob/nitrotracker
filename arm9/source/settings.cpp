@@ -48,11 +48,11 @@ fat(use_fat)
 	if(fat == true)
 	{
 		// Check if the config file exists and, if not, create it
-		if(!diropen("/data"))
+		if(!opendir("/data"))
 		{
 			mkdir("/data", 777);
 		}
-		if(!diropen("/data/NitroTracker"))
+		if(!opendir("/data/NitroTracker"))
 		{
 			mkdir("/data/NitroTracker", 777);
 		}
@@ -149,7 +149,7 @@ void Settings::setTheme(Theme *theme_)
 
 char *Settings::getSongPath(void)
 {
-    if(!diropen(songpath)) {
+    if(!opendir(songpath)) {
         strcpy(songpath, "/");
     }
     return songpath;
@@ -166,7 +166,7 @@ void Settings::setSongPath(const char* songpath_)
 
 char *Settings::getSamplePath(void)
 {
-    if(!diropen(samplepath)) {
+    if(!opendir(samplepath)) {
         strcpy(samplepath, "/");
     }
 	return samplepath;
