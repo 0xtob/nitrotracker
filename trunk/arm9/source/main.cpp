@@ -3544,6 +3544,12 @@ int main(void) {
 			handleDSMWRecv();
 		}
 #endif
+
+#ifdef DEBUG
+        if(keysHeld() == (KEY_START | KEY_SELECT | KEY_L | KEY_R)) {
+            return 0;
+        }
+#endif
 		swiWaitForVBlank();
 	}
 }
