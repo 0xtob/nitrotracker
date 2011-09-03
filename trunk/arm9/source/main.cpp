@@ -3475,6 +3475,8 @@ int main(void) {
 
 #ifdef USE_FAT
 	bool fat_success = fatInitDefault();
+#else
+    bool fat_success = false;
 #endif
 
 	state = new State();
