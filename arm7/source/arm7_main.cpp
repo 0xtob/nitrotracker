@@ -37,30 +37,15 @@ extern "C" {
 #include <dswifi7.h>
 #endif
 
-#define LID_BIT BIT(7)
-
 #define abs(x)	((x)>=0?(x):-(x))
 
 NTXM7 *ntxm7 = 0;
 
-bool lidwasdown = false;
 static volatile bool exitflag = false;
 extern bool ntxm_recording;
 
 int vcount;
 touchPosition first,tempPos;
-
-// Thanks to LiraNuna for this cool function
-void PM_SetRegister(int reg, int control)
-{
-	SerialWaitBusy();
-	REG_SPICNT = SPI_ENABLE | SPI_DEVICE_POWER |SPI_BAUD_1MHz | SPI_CONTINUOUS;
-	REG_SPIDATA = reg;
-	SerialWaitBusy();
-	REG_SPICNT = SPI_ENABLE | SPI_DEVICE_POWER |SPI_BAUD_1MHz;
-	REG_SPIDATA = control;
-}
-
 
 //---------------------------------------------------------------------------------
 void VcountHandler() {
@@ -74,18 +59,6 @@ void VcountHandler() {
 
 void VblankHandler(void)
 {
-	if((!lidwasdown)&&(REG_KEYXY & LID_BIT))
-	{
-		PM_SetRegister(0, 0x30);
-		lidwasdown = true;
-	}
-
-	if((lidwasdown)&&(!(REG_KEYXY & LID_BIT)))
-	{
-		PM_SetRegister(0, 0x0D);
-		lidwasdown = false;
-	}
-
 #ifdef WIFI
 	if(ntxm_recording == false)
 		Wifi_Update(); // update wireless in vblank
