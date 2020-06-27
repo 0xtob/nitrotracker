@@ -44,6 +44,7 @@ extern "C" {
 NTXM7 *ntxm7 = 0;
 
 bool lidwasdown = false;
+static volatile bool exitflag = false;
 extern bool ntxm_recording;
 
 int vcount;
@@ -105,6 +106,10 @@ void enableSound() {
     REG_MASTER_VOLUME = 127;
 }
 
+void powerButtonHandler(void) {
+	exitflag = true;
+}
+
 //---------------------------------------------------------------------------------
 int main(int argc, char ** argv) {
 //---------------------------------------------------------------------------------
@@ -112,6 +117,7 @@ int main(int argc, char ** argv) {
     rtcReset(); // Reset the clock if needed
     irqInit();
     fifoInit();
+	touchInit();
 #ifdef WIFI
     installWifiFIFO();
 #endif
@@ -140,8 +146,12 @@ int main(int argc, char ** argv) {
 	irqSet(IRQ_TIMER0, ntxmTimerHandler);
 	irqEnable(IRQ_TIMER0);
 
+	setPowerButtonCB(powerButtonHandler);
+
 	// Keep the ARM7 out of main RAM
-	while (1) {
+	while (!exitflag) {
 		swiWaitForVBlank();
 	}
+
+	return 0;
 }

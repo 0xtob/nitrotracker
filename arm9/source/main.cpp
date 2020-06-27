@@ -1621,7 +1621,7 @@ void setNoteVol(u16 vol)
 	DC_FlushAll();
 }
 
-void handleNoteVolumeChanged(int vol)
+void handleNoteVolumeChanged(s32 vol)
 {
 	setNoteVol(vol);
 }

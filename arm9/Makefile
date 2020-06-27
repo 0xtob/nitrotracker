@@ -46,7 +46,7 @@ CXXFLAGS	:=	$(CFLAGS) -fno-rtti
 
 ASFLAGS	:=	-g $(ARCH) -march=armv5te -mtune=arm946e-s
 
-LDFLAGS	=	-specs=ds_arm9.specs -g $(ARCH) -mno-fpu -Wl,-Map,$(notdir $*.map)
+LDFLAGS	=	-specs=ds_arm9.specs -g $(ARCH) -Wl,-Map,$(notdir $*.map)
 
 #---------------------------------------------------------------------------------
 # any extra libraries we wish to link with the project
@@ -66,7 +66,6 @@ LIBDIRS	:= $(LIBDSMI) $(LIBNTXM) $(TOPDIR)/tobkit $(LIBNDS)
 ifneq ($(BUILD),$(notdir $(CURDIR)))
 #---------------------------------------------------------------------------------
  
-export ARM9BIN	:=	$(TOPDIR)/$(TARGET).arm9
 export ARM9ELF	:=	$(CURDIR)/$(TARGET).arm9.elf
 export DEPSDIR := $(CURDIR)/$(BUILD)
 
@@ -122,10 +121,6 @@ DEPENDS	:=	$(OFILES:.o=.d)
 #---------------------------------------------------------------------------------
 # main targets
 #---------------------------------------------------------------------------------
-$(ARM9BIN)	:	$(ARM9ELF) 
-	@$(OBJCOPY) -O binary $< $@
-	@echo built ... $(notdir $@)
-
 $(ARM9ELF)	:	$(OFILES)
 	@echo linking $(notdir $@)
 	$(LD)  $(LDFLAGS) $(OFILES) $(LIBPATHS) $(LIBS) -o $@
