@@ -124,6 +124,7 @@ u8 active_buffer = FRONT_BUFFER;
 u16 *main_vram_front, *main_vram_back, *sub_vram;
 
 bool typewriter_active = false;
+bool exit_requested = false;
 
 u16 keys_that_are_repeated = KEY_UP | KEY_DOWN | KEY_LEFT | KEY_RIGHT;
 u16 repeatkeys = 0, repeatkeys_last = 0;
@@ -1978,6 +1979,10 @@ void deleteMessageBox(void)
 	redrawSubScreen();
 }
 
+void requestExit(void)
+{
+	exit_requested = true;
+}
 
 void showMessage(const char *msg)
 {
@@ -2481,7 +2486,7 @@ void sampleDrawToggle(bool on)
 	sampledisplay->setDrawMode(on);
 }
 
-void setupGUI(void)
+void setupGUI(int argc, char **argv)
 {
 	gui = new GUI();
 	gui->setTheme(settings->getTheme(), settings->getTheme()->col_dark_bg);
@@ -2518,6 +2523,15 @@ void setupGUI(void)
 		fileselector->selectFilter("song");
 		fileselector->registerFileSelectCallback(handleFileChange);
 		fileselector->registerDirChangeCallback(handleDirChange);
+
+	// check argv to set working directory
+	if (argc >= 1 && argv != NULL && argv[0] != NULL) {
+		char *path_split = strrchr(argv[0], '/');
+		if (path_split != NULL && (path_split - argv[0]) >= 1) {
+			std::string dir(argv[0]);
+			fileselector->setDir(dir.substr(0, path_split - argv[0]));
+		}
+	}
 
 		rbgdiskop = new RadioButton::RadioButtonGroup();
 
@@ -3228,25 +3242,14 @@ void VblankHandler(void)
 		}*/
 	}
 
-	/*
-	 * reboot code commented out for now
 	if( (keysheld & KEY_START) && (keysheld & KEY_SELECT) && (mb == 0) )
 	{
-		fatInitDefault();
-#ifdef DEBUG
-		if(can_reboot())
-			reboot(); // >:-)
-#else
-		if(can_reboot())
-		{
-			mb = new MessageBox(&sub_vram, "really exit", 2, "yes", reboot, "no", deleteMessageBox);
-			gui->registerOverlayWidget(mb, 0, SUB_SCREEN);
-			mb->show();
-			mb->pleaseDraw();
-		}
-#endif
+		mb = new MessageBox(&sub_vram, "really exit", 2, "yes", requestExit, "no", deleteMessageBox);
+		gui->registerOverlayWidget(mb, 0, SUB_SCREEN);
+		mb->reveal();
+		mb->pleaseDraw();
 	}
-	*/
+	
 	if(keysup)
 	{
 		gui->buttonRelease(keysup);
@@ -3377,7 +3380,7 @@ void applySettings(void)
 }
 
 //---------------------------------------------------------------------------------
-int main(void) {
+int main(int argc, char **argv) {
 //---------------------------------------------------------------------------------
 #ifdef GURU
 	defaultExceptionHandler();
@@ -3406,7 +3409,7 @@ int main(void) {
 	// Sub screen: Keyboard tiles, Typewriter tiles and ERB
 	videoSetModeSub(MODE_5_2D | DISPLAY_BG0_ACTIVE | DISPLAY_BG1_ACTIVE | DISPLAY_BG2_ACTIVE);
 
-	vramSetMainBanks(VRAM_A_MAIN_BG_0x06000000, VRAM_B_MAIN_BG_0x06020000,
+	vramSetPrimaryBanks(VRAM_A_MAIN_BG_0x06000000, VRAM_B_MAIN_BG_0x06020000,
 	           VRAM_C_SUB_BG_0x06200000 , VRAM_D_LCD);
 
 	// SUB_BG0 for Piano Tiles
@@ -3514,7 +3517,7 @@ int main(void) {
 
 	CommandSetSong(song);
 
-	setupGUI();
+	setupGUI(argc, argv);
 
 	applySettings();
 #ifndef DEBUG
@@ -3532,7 +3535,7 @@ int main(void) {
 	iprintf("NitroTracker debug build.\nBuilt %s %s\n<Start> clears messages.\n", __DATE__, __TIME__);
 #endif
 
-	while(1)
+	while(!exit_requested)
 	{
 		VblankHandler();
 #ifdef WIFIDEBUG
@@ -3547,9 +3550,11 @@ int main(void) {
 
 #ifdef DEBUG
         if(keysHeld() == (KEY_START | KEY_SELECT | KEY_L | KEY_R)) {
-            return 0;
+            exit_requested = true;
         }
 #endif
 		swiWaitForVBlank();
 	}
+
+	return 0;
 }

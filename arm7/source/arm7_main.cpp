@@ -28,7 +28,6 @@
 
 extern "C" {
   #include "ntxm/linear_freq_table.h"
-  #include "ntxm/tobmic.h"
 }
 
 #define WIFI
@@ -102,9 +101,6 @@ int main(int argc, char ** argv) {
 	SetYtrigger(80);
 	irqSet(IRQ_VCOUNT, VcountHandler);
 	irqEnable(IRQ_VCOUNT);
-
-	irqSet(IRQ_TIMER1, tob_ProcessMicrophoneTimerIRQ);
-	irqEnable(IRQ_TIMER1);
 
 #ifdef WIFI
 	irqEnable(IRQ_NETWORK);
