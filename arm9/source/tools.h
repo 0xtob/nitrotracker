@@ -32,6 +32,8 @@
 
 // A collection of utilities for everyday DS coding
 
+#define ceil_f32toint(n) (((n) + ((1 << 12) - 1)) >> 12)
+
 #define min(x,y) ((x)<(y)?(x):(y))
 #define max(x,y) ((x)>(y)?(x):(y))
 

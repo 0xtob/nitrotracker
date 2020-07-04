@@ -488,12 +488,10 @@ void SampleDisplay::draw(void)
 	for(u8 i=0; i<DRAW_HEIGHT+2; ++i)
 		colortable[i] = interpolateColor(theme->col_light_ctrl, theme->col_dark_ctrl, i);
 
-	// TODO; Eliminate floats here!!
+	int32 step = divf32(inttof32(smp->getNSamples() >> zoom_level), inttof32(width-2));
+	int32 pos = 0;
 
-	float step = (float)(smp->getNSamples() >> zoom_level) / (float)(width-2);
-	float pos = 0.0f;
-
-	u32 renderwindow = (u32)MAX(1, MIN(100, ceil(step)));
+	u32 renderwindow = (u32)MAX(1, MIN(100, ceil_f32toint(step)));
 
 	u16 middle = (DRAW_HEIGHT+2)/2;//-1;
 
@@ -505,7 +503,7 @@ void SampleDisplay::draw(void)
 
 		for(u32 i=1; i<u32(width-1); ++i)
 		{
-			data = &(base[(u32)pos]);
+			data = &(base[f32toint(pos)]);
 
 			s32 maxsmp = -32767, minsmp = 32767;
 
@@ -536,11 +534,11 @@ void SampleDisplay::draw(void)
 	} else {
 
 		s8 *data;
-		s8 *base = (s8*)smp->getData();
+		s8 *base = (s8*)smp->getData() + pixelToSample(0);
 
 		for(u32 i=1; i<u32(width-1); ++i)
 		{
-			data = &(base[(u32)pos]) + pixelToSample(0);
+			data = &(base[f32toint(pos)]);
 
 			s8 maxsmp = -127, minsmp = 127;
 
