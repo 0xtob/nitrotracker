@@ -331,11 +331,11 @@ void PatternView::draw(void)
 	}
 	
 	// Channel indices
-	char *numberstr = (char*)malloc(3);
+	char *numberstr = (char*) malloc(3);
 	for(u16 i=0;i<getNumVisibleChannels();++i)
 	{
 		drawFullBox(PV_BORDER_WIDTH+i*getCellWidth()+1, 1, 14, 11, col_bg);
-		sprintf(numberstr,"%-2x",hscrollpos+i);
+		snprintf(numberstr, 3, "%-2x", (u8) (hscrollpos+i));
 		drawString(numberstr, PV_BORDER_WIDTH+i*getCellWidth()+1, 1, 255, col_lines);
 	}
 	free(numberstr);

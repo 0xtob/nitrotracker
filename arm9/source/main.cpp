@@ -296,8 +296,8 @@ void drawSampleNumbers(void)
 	for(u8 key=0; key<24; ++key)
 	{
 		note = state->basenote + key;
-		sample_id = inst->getNoteSample(note);
-		sprintf(&label, "%x", sample_id);
+		sample_id = inst->getNoteSample(note) & 0x0F;
+		label = (sample_id >= 0xA) ? (sample_id - 0xA + 'a') : (sample_id + '0');
 
 		kb->setKeyLabel(key, label);
 	}
@@ -354,7 +354,8 @@ void handleNoteStroke(u8 note)
 		}
 
 		char label;
-		sprintf(&label, "%x", state->sample);
+		u8 sample_id = state->sample & 0xF;
+		label = (sample_id >= 0xA) ? (sample_id - 0xA + 'a') : (sample_id + '0');
 		kb->setKeyLabel(note, label);
 	}
 
@@ -395,14 +396,13 @@ void updateSampleList(Instrument *inst)
 	else
 	{
 		Sample *sample;
-		char *str=(char*)malloc(255);
+		char *str=(char*) calloc(1, SAMPLE_NAME_LENGTH + 1);
 		for(u8 i=0; i<MAX_INSTRUMENT_SAMPLES; ++i)
 		{
-			memset(str, 0, 255);
 			sample = inst->getSample(i);
 			if(sample != NULL)
 			{
-				strcpy(str, sample->getName());
+				strncpy(str, sample->getName(), SAMPLE_NAME_LENGTH);
 				lbsamples->set(i, str);
 			} else {
 				lbsamples->set(i, "");
@@ -506,16 +506,16 @@ void handleInstChange(u16 newinst)
 
 void updateLabelSongLen(void)
 {
-	char *labelstr = (char*)malloc(12);
-	sprintf(labelstr, "songlen:%2d", song->getPotLength());
-	//labelsonglen->setCaption(labelstr);
-	free(labelstr);
+	/* char *labelstr = (char*)malloc(12);
+	snprintf(labelstr, 12, "songlen:%2d", song->getPotLength());
+	labelsonglen->setCaption(labelstr);
+	free(labelstr); */
 }
 
 void updateLabelChannels(void)
 {
-	char *labelstr = (char*)malloc(8);
-	sprintf(labelstr, "chn: %2d", song->getChannels());
+	char *labelstr = (char*)malloc(9);
+	snprintf(labelstr, 9, "chn: %2d", song->getChannels());
 	labelchannels->setCaption(labelstr);
 	free(labelstr);
 }
@@ -529,6 +529,7 @@ void updateTempoAndBpm(void)
 void setSong(Song *newsong)
 {
 	song = newsong;
+	char *str = (char*) calloc(1, 256);
 
 	CommandSetSong(song);
 
@@ -542,24 +543,19 @@ void setSong(Song *newsong)
 	// Update POT
 	lbpot->clear();
 	u8 potentry;
-	char *str=(char*)malloc(3);
-	str[2]=0;
 	for(u8 i=0;i<song->getPotLength();++i) {
 		potentry = song->getPotEntry(i);
-		sprintf(str, "%2x", potentry);
+		snprintf(str, 255, "%2x", potentry);
 		lbpot->add(str);
 	}
-	free(str);
 
 	// Update instrument list
 	Instrument *inst;
-	str=(char*)malloc(255);
 	for(u8 i=0;i<MAX_INSTRUMENTS;++i)
 	{
-		memset(str, 0, 255);
 		inst = song->getInstrument(i);
 		if(inst!=NULL) {
-			strcpy(str, inst->getName());
+			strncpy(str, inst->getName(), 255);
 			lbinstruments->set(i, str);
 		} else {
 			lbinstruments->set(i, "");
@@ -599,8 +595,7 @@ void setSong(Song *newsong)
 
 	lbsamples->select(0);
 
-	memset(str, 0, 255);
-	strcpy(str, song->getName());
+	strncpy(str, song->getName(), 255);
 	labelsongname->setCaption(str);
 
 	free(str);
@@ -1509,18 +1504,18 @@ void handleFileChange(File file)
 {
 	if(!file.is_dir)
 	{
-		char *str = (char*)malloc(256);
-		strncpy(str, file.name.c_str(), 256);
+		char *str = (char*)malloc(file.name.length() + 1);
+		strcpy(str, file.name.c_str());
 		lowercase(str);
 		labelFilename->setCaption(str);
 
 		if(rbsong->getActive() == true)
 		{
-			strcpy(state->song_filename, str);
+			strncpy(state->song_filename, str, STATE_FILENAME_LEN);
 		}
 		else if(rbsample->getActive() == true)
 		{
-			strcpy(state->sample_filename, str);
+			strncpy(state->sample_filename, str, STATE_FILENAME_LEN);
 		}
 
 		// Preview wav files

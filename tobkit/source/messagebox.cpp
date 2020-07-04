@@ -28,11 +28,11 @@ MessageBox::MessageBox(u16 **_vram, const char *message, u8 n_buttons, ...)
 	// Calculate width
 	width = 10;
 	char *str;
-	void (*onPush)(void);
+	// void (*onPush)(void);
 	for(u8 i=0;i<n_buttons;++i)
 	{
 		str = va_arg(marker, char*);
-		onPush = va_arg(marker, void (*)(void));
+		/* onPush = */ va_arg(marker, void (*)(void));
 		width += getStringWidth(str) + 14;
 	}
 	va_end(marker);

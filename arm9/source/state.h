@@ -31,6 +31,8 @@
 #include <nds.h>
 #include "ntxm/song.h"
 
+#define STATE_FILENAME_LEN 511
+
 class State {
 	public:
 		State(void);

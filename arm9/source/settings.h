@@ -31,6 +31,8 @@
 
 #include <stdlib.h>
 
+#define SETTINGS_FILENAME_LEN 255
+
 enum Handedness {LEFT_HANDED, RIGHT_HANDED};
 
 class Settings {
@@ -67,8 +69,8 @@ class Settings {
 		Handedness handedness;
 		bool sample_preview;
 		Theme *theme;
-		char songpath[256];
-		char samplepath[256];
+		char songpath[SETTINGS_FILENAME_LEN + 1];
+		char samplepath[SETTINGS_FILENAME_LEN + 1];
         bool fat;
 };
 

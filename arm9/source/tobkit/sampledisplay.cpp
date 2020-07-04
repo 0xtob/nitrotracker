@@ -585,9 +585,11 @@ void SampleDisplay::draw(void)
 			for(u8 i=1; i<DRAW_HEIGHT+1; ++i)
 				*(*vram+SCREEN_WIDTH*(y+i)+x+loop_start_pos) = colortable[middle];
 
+			/* unused
 			u8 cutoff = 0;
 			if(loop_start_pos < 1+LOOP_TRIANGLE_SIZE)
 				cutoff = 1+LOOP_TRIANGLE_SIZE - loop_start_pos;
+			*/
 
 			// Left Triangle
 			if(loop_start_pos > 1 + LOOP_TRIANGLE_SIZE)

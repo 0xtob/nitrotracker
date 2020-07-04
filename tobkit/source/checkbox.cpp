@@ -23,8 +23,8 @@ CheckBox::~CheckBox()
 void CheckBox::setCaption(const char *_label)
 {
 	if (label) free(label);
-	label = (char*)calloc(256, 1);
-	strncpy(label, _label, 256);
+	label = (char*) malloc(sizeof(_label) + 1);
+	strcpy(label, _label);
 }
 
 void CheckBox::setChecked(bool checked_)

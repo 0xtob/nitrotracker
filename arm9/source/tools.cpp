@@ -54,7 +54,7 @@ void dbgWaitButton(void)
 
 void PrintFreeMem(void)
 {
-	iprintf("FreeMem=%dbyte    \n", my_get_free_mem());
+	iprintf("FreeMem=%ldbyte    \n", my_get_free_mem());
 }
 
 void printMallInfo(void)

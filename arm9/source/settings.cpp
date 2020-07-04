@@ -48,11 +48,11 @@ sample_preview(true),
 theme(new Theme()),
 fat(use_fat)
 {
-	memset(songpath, 0, 255);
-	memset(samplepath, 0, 255);
+	memset(songpath, 0, SETTINGS_FILENAME_LEN + 1);
+	memset(samplepath, 0, SETTINGS_FILENAME_LEN + 1);
 
-	strcpy(songpath,"/");
-	strcpy(samplepath,"/");
+	strncpy(songpath, "/", SETTINGS_FILENAME_LEN);
+	strncpy(samplepath, "/", SETTINGS_FILENAME_LEN);
 
 	if(fat == true)
 	{
@@ -153,15 +153,15 @@ void Settings::setTheme(Theme *theme_)
 char *Settings::getSongPath(void)
 {
     if(!opendir(songpath)) {
-        strcpy(songpath, "/");
+        strncpy(songpath, "/", SETTINGS_FILENAME_LEN);
     }
     return songpath;
 }
 
 void Settings::setSongPath(const char* songpath_)
 {
-	strncpy(songpath, songpath_, 255);
-	songpath[min(255, strlen(songpath_))] = 0;
+	strncpy(songpath, songpath_, SETTINGS_FILENAME_LEN);
+	songpath[SETTINGS_FILENAME_LEN] = '\0';
     if(fat) {
     	write();
     }
@@ -170,15 +170,15 @@ void Settings::setSongPath(const char* songpath_)
 char *Settings::getSamplePath(void)
 {
     if(!opendir(samplepath)) {
-        strcpy(samplepath, "/");
+        strncpy(samplepath, "/", SETTINGS_FILENAME_LEN);
     }
 	return samplepath;
 }
 
 void Settings::setSamplePath(const char* samplepath_)
 {
-	strncpy(samplepath, samplepath_, 255);
-	samplepath[min(255, strlen(samplepath_))] = 0;
+	strncpy(samplepath, samplepath_, SETTINGS_FILENAME_LEN);
+	samplepath[SETTINGS_FILENAME_LEN] = '\0';
     if(fat) {
     	write();
     }

@@ -36,8 +36,8 @@ void State::reset(void)
 	dsmi_send = true;
 	dsmi_recv = true;
 	preview_sample = 0;
-	song_filename = (char*)calloc(1, 512);
-	sample_filename = (char*)calloc(1, 512);
+	song_filename = (char*)calloc(1, STATE_FILENAME_LEN + 1);
+	sample_filename = (char*)calloc(1, STATE_FILENAME_LEN + 1);
 
 	resetSong();
 }

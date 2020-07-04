@@ -283,7 +283,7 @@ void FileSelector::read_directory(void)
 	activeelement = 0;
 	scrollpos = 0;
 	//iprintf("%d\n", __LINE__);
-	filename = (char*)malloc(256);
+	filename = (char*) calloc(1, 256);
 	std::string newentry;
 	for(u16 i=0;i<filelist.size();++i) {
 		newentry = filelist.at(i).name;
