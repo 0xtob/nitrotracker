@@ -237,7 +237,7 @@ void PatternView::unmute(u16 channel)
 void PatternView::draw(void)
 {
 	u32 colcol = col_bg | col_bg << 16;
-	dmaFillWordsDamnFast(colcol, *vram, 192*256*2);
+	dmaFillWords(colcol, *vram, 192*256*2);
 	
 	// Selection
 	if(selection_exists == true) {

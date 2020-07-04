@@ -394,7 +394,7 @@ void SampleDisplay::draw(void)
 	//
 	//drawFullBox(0, 0, width, height, theme->col_dark_bg);
 	u32 colcol = theme->col_dark_bg | theme->col_dark_bg << 16;
-	for(int j=y;j<y+height;++j) dmaFillWordsDamnFast(colcol, *vram+256*j+x, width*2);
+	for(int j=y;j<y+height;++j) dmaFillWords(colcol, *vram+256*j+x, width*2);
 
 	if(active==false) {
 		drawBorder();
