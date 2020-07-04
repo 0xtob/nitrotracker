@@ -112,7 +112,7 @@ void NumberBox::draw(void)
 	// Set no of digits (hacky, but there's no other way)
 	formatstr[1] = digits+48;
 	
-	sprintf(numberstr, formatstr, value);
+	snprintf(numberstr, 4, formatstr, value);
 	drawString(numberstr, 10, 5);
 	free(numberstr);
 	

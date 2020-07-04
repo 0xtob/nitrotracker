@@ -33,6 +33,15 @@
 
 /* ===================== PUBLIC ===================== */
 
+static void dir_create(const char *path) {
+	DIR *dir;
+	if (!(dir = opendir(path))) {
+		mkdir(path, 0777);
+	} else {
+		closedir(dir);
+	}
+}
+
 Settings::Settings(bool use_fat)
 : handedness(RIGHT_HANDED),
 sample_preview(true),
@@ -48,14 +57,8 @@ fat(use_fat)
 	if(fat == true)
 	{
 		// Check if the config file exists and, if not, create it
-		if(!opendir("/data"))
-		{
-			mkdir("/data", 777);
-		}
-		if(!opendir("/data/NitroTracker"))
-		{
-			mkdir("/data/NitroTracker", 777);
-		}
+		dir_create("/data");
+		dir_create("/data/NitroTracker");
 		FILE *conf = fopen("/data/NitroTracker/NitroTracker.conf", "r");
 		if(conf == NULL)
 		{

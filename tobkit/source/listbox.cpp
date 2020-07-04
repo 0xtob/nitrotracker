@@ -312,7 +312,7 @@ void ListBox::draw(void)
 			offset=1;
 		}
 		for(i=0;(i<height/ROW_HEIGHT)&&(scrollpos+i<elements.size());++i) {
-			sprintf(numberstr,"%2x",scrollpos+i+offset);
+			snprintf(numberstr, 4, "%2x",scrollpos+i+offset);
 			drawString(numberstr, 2, ROW_HEIGHT*i+2);
 		}
 		free(numberstr);

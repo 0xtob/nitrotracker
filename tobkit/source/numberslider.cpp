@@ -153,9 +153,9 @@ void NumberSlider::draw(void)
 	drawFullBox(9,1,width-10,height-2,theme->col_lighter_bg);
 	char *numberstr = (char*)malloc(4);
 	if(hex==true) {
-		sprintf(numberstr, "%2x", value);
+		snprintf(numberstr, 4, "%2x", value);
 	} else {
-		sprintf(numberstr, "%3d", value);
+		snprintf(numberstr, 4, "%3d", value);
 	}
 	drawString(numberstr, 10, 5);
 	free(numberstr);

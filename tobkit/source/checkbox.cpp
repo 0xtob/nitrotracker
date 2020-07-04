@@ -17,12 +17,12 @@ CheckBox::CheckBox(u8 _x, u8 _y, u8 _width, u8 _height, u16 **_vram, bool _visib
 
 CheckBox::~CheckBox()
 {
-	if(label)
-		free(label);
+	if (label) free(label);
 }
 
 void CheckBox::setCaption(const char *_label)
 {
+	if (label) free(label);
 	label = (char*)calloc(256, 1);
 	strncpy(label, _label, 256);
 }

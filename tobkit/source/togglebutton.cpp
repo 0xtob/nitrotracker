@@ -13,6 +13,11 @@ ToggleButton::ToggleButton(u8 _x, u8 _y, u8 _width, u8 _height, u16 **_vram, boo
 	caption = (char*)calloc(1, 1);
 }
 
+ToggleButton::~ToggleButton()
+{
+	if (caption) free(caption);
+}
+
 // Callback registration
 void ToggleButton::registerToggleCallback(void (*onToggle_)(bool)) {
 	onToggle = onToggle_;
@@ -51,9 +56,7 @@ void ToggleButton::buttonPress(u16 button)
 
 void ToggleButton::setCaption(const char *_caption)
 {
-	if(caption != 0)
-		free(caption);
-
+	if (caption) free(caption);
 	caption = (char*)malloc(strlen(_caption)+1);
 	strcpy(caption, _caption);
 }
