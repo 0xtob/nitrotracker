@@ -861,9 +861,8 @@ void deleteTypewriter(void)
 
 void handleTypewriterFilenameOk(void)
 {
-
 	char *text = tw->getText();
-	char *name = 0;
+	char *name = NULL;
 	iprintf("%s\n", text);
 	if(strcmp(text,"") != 0)
 	{
@@ -900,6 +899,7 @@ void handleTypewriterFilenameOk(void)
 		}
 	}
 	deleteTypewriter();
+	if (name != NULL) free(name);
 }
 
 
