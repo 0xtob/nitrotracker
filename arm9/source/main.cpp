@@ -259,8 +259,8 @@ void clearMainScreen(void)
 {
 	u16 col = settings->getTheme()->col_dark_bg;
 	u32 colcol = col | col << 16;
-	swiFastCopy(&colcol, main_vram_front, 192*256/2 | COPY_MODE_FILL);
-	swiFastCopy(&colcol, main_vram_back, 192*256/2 | COPY_MODE_FILL);
+	dmaFillWords(colcol, main_vram_front, 256 * 192 * 2);
+	dmaFillWords(colcol, main_vram_back, 256 * 192 * 2);
 }
 
 void clearSubScreen(void)
@@ -268,12 +268,13 @@ void clearSubScreen(void)
 	u16 col = settings->getTheme()->col_dark_bg;
 	u32 colcol = col | col << 16;
 	// Fill the bg with the bg color except for the place where the keyboard is
-	swiFastCopy(&colcol, sub_vram, 153*256/2 | COPY_MODE_FILL);
+	dmaFillWords(colcol, sub_vram, 256 * 153 * 2);
 	for(int y=154;y<192;++y)
 	{
-		for(int x=0;x<224;++x)
+		int x = 0;
+		for(;x<224;++x)
 			sub_vram[256*y+x] = 0;
-		for(int x=224;x<256;++x)
+		for(;x<256;++x)
 			sub_vram[256*y+x] = colcol;
 	}
 }
@@ -993,9 +994,9 @@ void drawMainScreen(void)
 void redrawSubScreen(void)
 {
 	// Fill screen
-	for(u16 i=0;i<256*153;++i) {
-		sub_vram[i] = RGB15(4,6,15)|BIT(15);
-	}
+	u16 col = RGB15(4,6,15)|BIT(15);
+	u32 colcol = col | col << 16;
+	dmaFillWords(colcol, sub_vram, 256 * 153 * 2);
 
 	// Redraw GUI
 	gui->drawSubScreen();
