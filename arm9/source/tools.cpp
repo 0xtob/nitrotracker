@@ -50,11 +50,21 @@ void dbgWaitButton(void)
 	while(! (keysDown()&KEY_A) ) scanKeys();
 }
 
-#endif
+/* https://devkitpro.org/viewtopic.php?f=6&t=3057 */
+
+extern u8 *fake_heap_end;
+extern u8 *fake_heap_start;
+
+static int getFreeMem() {
+	struct mallinfo mi = mallinfo();
+	return mi.fordblks + (fake_heap_end - (u8*)sbrk(0));
+}
+
+/* end */
 
 void PrintFreeMem(void)
 {
-	iprintf("FreeMem=%ldbyte    \n", my_get_free_mem());
+	iprintf("FreeMem=%dbyte    \n", getFreeMem());
 }
 
 void printMallInfo(void)
@@ -65,3 +75,5 @@ void printMallInfo(void)
 	iprintf("mmap bytes:       %d\n", mi.hblkhd);
 	iprintf("malloc chunks:    %d\n", mi.uordblks);
 }
+
+#endif
