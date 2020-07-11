@@ -32,7 +32,7 @@
 
 // A collection of utilities for everyday DS coding
 
-#define DMA0FILL	(*(vuint32*)0x040000E0)
+#define ceil_f32toint(n) (((n) + ((1 << 12) - 1)) >> 12)
 
 #define min(x,y) ((x)<(y)?(x):(y))
 #define max(x,y) ((x)>(y)?(x):(y))
@@ -42,17 +42,5 @@ void dbgWaitButton(void);
 
 void PrintFreeMem(void);
 void printMallInfo(void);
-
-// The fastest known clear method on the DS known to man (or to me, at least)
-// I found out that the version in libnds doesn't use the special fill
-// register that has fast, cache-less read access.
-inline void dmaFillWordsDamnFast(const u32 word, void* dest, uint32 size)
-{
-	DMA0FILL = word;
-	DMA_SRC(0) = (u32)(&DMA0FILL);
-	DMA_DEST(0) = (uint32)dest;
-	DMA_CR(0) = DMA_SRC_FIX | DMA_COPY_WORDS | size >> 2;
-	while(DMA_CR(0) & DMA_BUSY);
-}
 
 #endif

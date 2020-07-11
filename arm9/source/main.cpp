@@ -124,6 +124,7 @@ u8 active_buffer = FRONT_BUFFER;
 u16 *main_vram_front, *main_vram_back, *sub_vram;
 
 bool typewriter_active = false;
+bool exit_requested = false;
 
 u16 keys_that_are_repeated = KEY_UP | KEY_DOWN | KEY_LEFT | KEY_RIGHT;
 u16 repeatkeys = 0, repeatkeys_last = 0;
@@ -258,8 +259,8 @@ void clearMainScreen(void)
 {
 	u16 col = settings->getTheme()->col_dark_bg;
 	u32 colcol = col | col << 16;
-	swiFastCopy(&colcol, main_vram_front, 192*256/2 | COPY_MODE_FILL);
-	swiFastCopy(&colcol, main_vram_back, 192*256/2 | COPY_MODE_FILL);
+	dmaFillWords(colcol, main_vram_front, 256 * 192 * 2);
+	dmaFillWords(colcol, main_vram_back, 256 * 192 * 2);
 }
 
 void clearSubScreen(void)
@@ -267,12 +268,13 @@ void clearSubScreen(void)
 	u16 col = settings->getTheme()->col_dark_bg;
 	u32 colcol = col | col << 16;
 	// Fill the bg with the bg color except for the place where the keyboard is
-	swiFastCopy(&colcol, sub_vram, 153*256/2 | COPY_MODE_FILL);
+	dmaFillWords(colcol, sub_vram, 256 * 153 * 2);
 	for(int y=154;y<192;++y)
 	{
-		for(int x=0;x<224;++x)
+		int x = 0;
+		for(;x<224;++x)
 			sub_vram[256*y+x] = 0;
-		for(int x=224;x<256;++x)
+		for(;x<256;++x)
 			sub_vram[256*y+x] = colcol;
 	}
 }
@@ -294,8 +296,8 @@ void drawSampleNumbers(void)
 	for(u8 key=0; key<24; ++key)
 	{
 		note = state->basenote + key;
-		sample_id = inst->getNoteSample(note);
-		sprintf(&label, "%x", sample_id);
+		sample_id = inst->getNoteSample(note) & 0x0F;
+		label = (sample_id >= 0xA) ? (sample_id - 0xA + 'a') : (sample_id + '0');
 
 		kb->setKeyLabel(key, label);
 	}
@@ -352,7 +354,8 @@ void handleNoteStroke(u8 note)
 		}
 
 		char label;
-		sprintf(&label, "%x", state->sample);
+		u8 sample_id = state->sample & 0xF;
+		label = (sample_id >= 0xA) ? (sample_id - 0xA + 'a') : (sample_id + '0');
 		kb->setKeyLabel(note, label);
 	}
 
@@ -393,14 +396,13 @@ void updateSampleList(Instrument *inst)
 	else
 	{
 		Sample *sample;
-		char *str=(char*)malloc(255);
+		char *str=(char*) calloc(1, SAMPLE_NAME_LENGTH + 1);
 		for(u8 i=0; i<MAX_INSTRUMENT_SAMPLES; ++i)
 		{
-			memset(str, 0, 255);
 			sample = inst->getSample(i);
 			if(sample != NULL)
 			{
-				strcpy(str, sample->getName());
+				strncpy(str, sample->getName(), SAMPLE_NAME_LENGTH);
 				lbsamples->set(i, str);
 			} else {
 				lbsamples->set(i, "");
@@ -504,16 +506,16 @@ void handleInstChange(u16 newinst)
 
 void updateLabelSongLen(void)
 {
-	char *labelstr = (char*)malloc(12);
-	sprintf(labelstr, "songlen:%2d", song->getPotLength());
-	//labelsonglen->setCaption(labelstr);
-	free(labelstr);
+	/* char *labelstr = (char*)malloc(12);
+	snprintf(labelstr, 12, "songlen:%2d", song->getPotLength());
+	labelsonglen->setCaption(labelstr);
+	free(labelstr); */
 }
 
 void updateLabelChannels(void)
 {
-	char *labelstr = (char*)malloc(8);
-	sprintf(labelstr, "chn: %2d", song->getChannels());
+	char *labelstr = (char*)malloc(9);
+	snprintf(labelstr, 9, "chn: %2d", song->getChannels());
 	labelchannels->setCaption(labelstr);
 	free(labelstr);
 }
@@ -527,6 +529,7 @@ void updateTempoAndBpm(void)
 void setSong(Song *newsong)
 {
 	song = newsong;
+	char *str = (char*) calloc(1, 256);
 
 	CommandSetSong(song);
 
@@ -540,24 +543,19 @@ void setSong(Song *newsong)
 	// Update POT
 	lbpot->clear();
 	u8 potentry;
-	char *str=(char*)malloc(3);
-	str[2]=0;
 	for(u8 i=0;i<song->getPotLength();++i) {
 		potentry = song->getPotEntry(i);
-		sprintf(str, "%2x", potentry);
+		snprintf(str, 255, "%2x", potentry);
 		lbpot->add(str);
 	}
-	free(str);
 
 	// Update instrument list
 	Instrument *inst;
-	str=(char*)malloc(255);
 	for(u8 i=0;i<MAX_INSTRUMENTS;++i)
 	{
-		memset(str, 0, 255);
 		inst = song->getInstrument(i);
 		if(inst!=NULL) {
-			strcpy(str, inst->getName());
+			strncpy(str, inst->getName(), 255);
 			lbinstruments->set(i, str);
 		} else {
 			lbinstruments->set(i, "");
@@ -597,8 +595,7 @@ void setSong(Song *newsong)
 
 	lbsamples->select(0);
 
-	memset(str, 0, 255);
-	strcpy(str, song->getName());
+	strncpy(str, song->getName(), 255);
 	labelsongname->setCaption(str);
 
 	free(str);
@@ -859,9 +856,8 @@ void deleteTypewriter(void)
 
 void handleTypewriterFilenameOk(void)
 {
-
 	char *text = tw->getText();
-	char *name = 0;
+	char *name = NULL;
 	iprintf("%s\n", text);
 	if(strcmp(text,"") != 0)
 	{
@@ -898,6 +894,7 @@ void handleTypewriterFilenameOk(void)
 		}
 	}
 	deleteTypewriter();
+	if (name != NULL) free(name);
 }
 
 
@@ -992,9 +989,9 @@ void drawMainScreen(void)
 void redrawSubScreen(void)
 {
 	// Fill screen
-	for(u16 i=0;i<256*153;++i) {
-		sub_vram[i] = RGB15(4,6,15)|BIT(15);
-	}
+	u16 col = RGB15(4,6,15)|BIT(15);
+	u32 colcol = col | col << 16;
+	dmaFillWords(colcol, sub_vram, 256 * 153 * 2);
 
 	// Redraw GUI
 	gui->drawSubScreen();
@@ -1507,18 +1504,18 @@ void handleFileChange(File file)
 {
 	if(!file.is_dir)
 	{
-		char *str = (char*)malloc(256);
-		strncpy(str, file.name.c_str(), 256);
+		char *str = (char*)malloc(file.name.length() + 1);
+		strcpy(str, file.name.c_str());
 		lowercase(str);
 		labelFilename->setCaption(str);
 
 		if(rbsong->getActive() == true)
 		{
-			strcpy(state->song_filename, str);
+			strncpy(state->song_filename, str, STATE_FILENAME_LEN);
 		}
 		else if(rbsample->getActive() == true)
 		{
-			strcpy(state->sample_filename, str);
+			strncpy(state->sample_filename, str, STATE_FILENAME_LEN);
 		}
 
 		// Preview wav files
@@ -1621,7 +1618,7 @@ void setNoteVol(u16 vol)
 	DC_FlushAll();
 }
 
-void handleNoteVolumeChanged(int vol)
+void handleNoteVolumeChanged(s32 vol)
 {
 	setNoteVol(vol);
 }
@@ -1978,6 +1975,10 @@ void deleteMessageBox(void)
 	redrawSubScreen();
 }
 
+void requestExit(void)
+{
+	exit_requested = true;
+}
 
 void showMessage(const char *msg)
 {
@@ -2481,7 +2482,7 @@ void sampleDrawToggle(bool on)
 	sampledisplay->setDrawMode(on);
 }
 
-void setupGUI(void)
+void setupGUI(int argc, char **argv)
 {
 	gui = new GUI();
 	gui->setTheme(settings->getTheme(), settings->getTheme()->col_dark_bg);
@@ -2518,6 +2519,15 @@ void setupGUI(void)
 		fileselector->selectFilter("song");
 		fileselector->registerFileSelectCallback(handleFileChange);
 		fileselector->registerDirChangeCallback(handleDirChange);
+
+	// check argv to set working directory
+	if (argc >= 1 && argv != NULL && argv[0] != NULL) {
+		char *path_split = strrchr(argv[0], '/');
+		if (path_split != NULL && (path_split - argv[0]) >= 1) {
+			std::string dir(argv[0]);
+			fileselector->setDir(dir.substr(0, path_split - argv[0]));
+		}
+	}
 
 		rbgdiskop = new RadioButton::RadioButtonGroup();
 
@@ -3228,25 +3238,14 @@ void VblankHandler(void)
 		}*/
 	}
 
-	/*
-	 * reboot code commented out for now
 	if( (keysheld & KEY_START) && (keysheld & KEY_SELECT) && (mb == 0) )
 	{
-		fatInitDefault();
-#ifdef DEBUG
-		if(can_reboot())
-			reboot(); // >:-)
-#else
-		if(can_reboot())
-		{
-			mb = new MessageBox(&sub_vram, "really exit", 2, "yes", reboot, "no", deleteMessageBox);
-			gui->registerOverlayWidget(mb, 0, SUB_SCREEN);
-			mb->show();
-			mb->pleaseDraw();
-		}
-#endif
+		mb = new MessageBox(&sub_vram, "really exit", 2, "yes", requestExit, "no", deleteMessageBox);
+		gui->registerOverlayWidget(mb, 0, SUB_SCREEN);
+		mb->reveal();
+		mb->pleaseDraw();
 	}
-	*/
+	
 	if(keysup)
 	{
 		gui->buttonRelease(keysup);
@@ -3377,7 +3376,7 @@ void applySettings(void)
 }
 
 //---------------------------------------------------------------------------------
-int main(void) {
+int main(int argc, char **argv) {
 //---------------------------------------------------------------------------------
 #ifdef GURU
 	defaultExceptionHandler();
@@ -3406,7 +3405,7 @@ int main(void) {
 	// Sub screen: Keyboard tiles, Typewriter tiles and ERB
 	videoSetModeSub(MODE_5_2D | DISPLAY_BG0_ACTIVE | DISPLAY_BG1_ACTIVE | DISPLAY_BG2_ACTIVE);
 
-	vramSetMainBanks(VRAM_A_MAIN_BG_0x06000000, VRAM_B_MAIN_BG_0x06020000,
+	vramSetPrimaryBanks(VRAM_A_MAIN_BG_0x06000000, VRAM_B_MAIN_BG_0x06020000,
 	           VRAM_C_SUB_BG_0x06200000 , VRAM_D_LCD);
 
 	// SUB_BG0 for Piano Tiles
@@ -3514,7 +3513,7 @@ int main(void) {
 
 	CommandSetSong(song);
 
-	setupGUI();
+	setupGUI(argc, argv);
 
 	applySettings();
 #ifndef DEBUG
@@ -3532,7 +3531,7 @@ int main(void) {
 	iprintf("NitroTracker debug build.\nBuilt %s %s\n<Start> clears messages.\n", __DATE__, __TIME__);
 #endif
 
-	while(1)
+	while(!exit_requested)
 	{
 		VblankHandler();
 #ifdef WIFIDEBUG
@@ -3547,9 +3546,11 @@ int main(void) {
 
 #ifdef DEBUG
         if(keysHeld() == (KEY_START | KEY_SELECT | KEY_L | KEY_R)) {
-            return 0;
+            exit_requested = true;
         }
 #endif
 		swiWaitForVBlank();
 	}
+
+	return 0;
 }

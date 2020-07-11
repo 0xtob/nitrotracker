@@ -24,7 +24,7 @@ limitations under the License.
 GroupBox::GroupBox(u8 _x, u8 _y, u8 _width, u8 _height, u16 **_vram, bool _visible)
 	:Widget(_x, _y, _width, _height, _vram, _visible)
 {
-	text = (char*)malloc(256);
+	text = (char*) calloc(1, 256);
 }
 
 GroupBox::~GroupBox()
@@ -40,7 +40,7 @@ void GroupBox::pleaseDraw(void)
 
 void GroupBox::setText(const char *text)
 {
-	strncpy(this->text, text, 256);
+	strncpy(this->text, text, 255);
 	pleaseDraw();
 }
 

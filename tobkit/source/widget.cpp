@@ -129,12 +129,12 @@ void Widget::drawString(const char* str, u8 tx, u8 ty, u8 maxwidth, u16 color)
 		}
 
 		for(j=0;j<11;++j) {
-			for(i=0;i<8;++i) {
+			col = font_8x11_raw[N_FONT_CHARS*j+charidx];
+			for(i=0;i<8;++i,col>>=1) {
 				// Print a character from the bitmap font
 				// each char is 8 pixels wide, and 8 pixels
 				// are in a byte.
-				col = font_8x11_raw[N_FONT_CHARS*j+charidx];
-				if(col & BIT(i)) {
+				if(col & 1) {
 					*(*vram+SCREEN_WIDTH*(j+y+ty)+(i+x+tx+drawpos)) = color;
 				}
 				/*
@@ -327,10 +327,9 @@ u8 Widget::getStringWidth(const char *str, u16 limit)
 }
 
 void Widget::drawMonochromeIcon(u8 tx, u8 ty, u8 tw, u8 th, const u8 *icon, u16 color) {
-
+	u16 pixelidx = 0;
 	for(u8 j=0;j<th;++j) {
-		for(u8 i=0;i<tw;++i) {
-			u16 pixelidx = tw*j+i;
+		for(u8 i=0;i<tw;++i,++pixelidx) {
 			if(icon[pixelidx/8] & BIT(pixelidx%8) ) {
 				*(*vram+SCREEN_WIDTH*(y+ty+j)+x+tx+i) = color;
 			}

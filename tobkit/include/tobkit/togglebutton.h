@@ -23,6 +23,7 @@ limitations under the License.
 class ToggleButton: public Widget {
 	public:
 		ToggleButton(u8 _x, u8 _y, u8 _width, u8 _height, u16 **_vram, bool _visible=true);
+		~ToggleButton();
 
 		// Callback registration
 		void registerToggleCallback(void (*onToggle_)(bool));

@@ -28,7 +28,6 @@
 
 extern "C" {
   #include "ntxm/linear_freq_table.h"
-  #include "ntxm/tobmic.h"
 }
 
 #define WIFI
@@ -37,29 +36,15 @@ extern "C" {
 #include <dswifi7.h>
 #endif
 
-#define LID_BIT BIT(7)
-
 #define abs(x)	((x)>=0?(x):-(x))
 
 NTXM7 *ntxm7 = 0;
 
-bool lidwasdown = false;
+static volatile bool exitflag = false;
 extern bool ntxm_recording;
 
 int vcount;
 touchPosition first,tempPos;
-
-// Thanks to LiraNuna for this cool function
-void PM_SetRegister(int reg, int control)
-{
-	SerialWaitBusy();
-	REG_SPICNT = SPI_ENABLE | SPI_DEVICE_POWER |SPI_BAUD_1MHz | SPI_CONTINUOUS;
-	REG_SPIDATA = reg;
-	SerialWaitBusy();
-	REG_SPICNT = SPI_ENABLE | SPI_DEVICE_POWER |SPI_BAUD_1MHz;
-	REG_SPIDATA = control;
-}
-
 
 //---------------------------------------------------------------------------------
 void VcountHandler() {
@@ -73,18 +58,6 @@ void VcountHandler() {
 
 void VblankHandler(void)
 {
-	if((!lidwasdown)&&(REG_KEYXY & LID_BIT))
-	{
-		PM_SetRegister(0, 0x30);
-		lidwasdown = true;
-	}
-
-	if((lidwasdown)&&(!(REG_KEYXY & LID_BIT)))
-	{
-		PM_SetRegister(0, 0x0D);
-		lidwasdown = false;
-	}
-
 #ifdef WIFI
 	if(ntxm_recording == false)
 		Wifi_Update(); // update wireless in vblank
@@ -105,6 +78,10 @@ void enableSound() {
     REG_MASTER_VOLUME = 127;
 }
 
+void powerButtonHandler(void) {
+	exitflag = true;
+}
+
 //---------------------------------------------------------------------------------
 int main(int argc, char ** argv) {
 //---------------------------------------------------------------------------------
@@ -112,6 +89,7 @@ int main(int argc, char ** argv) {
     rtcReset(); // Reset the clock if needed
     irqInit();
     fifoInit();
+	touchInit();
 #ifdef WIFI
     installWifiFIFO();
 #endif
@@ -123,9 +101,6 @@ int main(int argc, char ** argv) {
 	SetYtrigger(80);
 	irqSet(IRQ_VCOUNT, VcountHandler);
 	irqEnable(IRQ_VCOUNT);
-
-	irqSet(IRQ_TIMER1, tob_ProcessMicrophoneTimerIRQ);
-	irqEnable(IRQ_TIMER1);
 
 #ifdef WIFI
 	irqEnable(IRQ_NETWORK);
@@ -140,8 +115,12 @@ int main(int argc, char ** argv) {
 	irqSet(IRQ_TIMER0, ntxmTimerHandler);
 	irqEnable(IRQ_TIMER0);
 
+	setPowerButtonCB(powerButtonHandler);
+
 	// Keep the ARM7 out of main RAM
-	while (1) {
+	while (!exitflag) {
 		swiWaitForVBlank();
 	}
+
+	return 0;
 }

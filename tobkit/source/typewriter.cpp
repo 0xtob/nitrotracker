@@ -220,15 +220,9 @@ void Typewriter::registerCancelCallback(void (*onCancel_)(void))
 
 void Typewriter::setText(const char *text_)
 {
-	for(u16 i=0;i<MAX_TEXT_LEN+1;++i) {
-		text[i] = 0;
-	}
-	u8 len = MAX_TEXT_LEN;
-	if(strlen(text_) < MAX_TEXT_LEN) {
-		len = strlen(text_);
-	}
-	strncpy(text, text_, len);
-	strlength = len;
+	strncpy(text, text_, MAX_TEXT_LEN);
+	text[MAX_TEXT_LEN] = 0;
+	strlength = strlen(text);
 	cursorpos = strlength;
 	label->setCaption(text);
 	redraw();

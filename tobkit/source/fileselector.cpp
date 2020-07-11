@@ -165,35 +165,24 @@ std::string stringtolowercase(std::string str)
 {
 	std::string outstr = str;
 	for(u8 i=0;i<str.size();++i) {
-		if((outstr[i]>=65)&&(outstr[i]<=90)) {
-			outstr[i]+=32;
-		}
+		outstr[i] = tolower(outstr[i]);
 	}
 	return outstr;
 }
 
 inline bool compare_filenames(File f1, File f2)
 {
-	char *fn1, *fn2;
-	fn1 = (char*)malloc(256);
-	fn2 = (char*)malloc(256);
-
-	strcpy(fn1, stringtolowercase(f1.name).c_str());
-	strcpy(fn2, stringtolowercase(f2.name).c_str());
-
 	bool res;
+
 	if((f1.is_dir)&&(!f2.is_dir)) {
 		res = true;
 	} else if ((!f1.is_dir)&&(f2.is_dir)) {
 		res = false;
-	} else if(strcmp(fn1,fn2)<0) {
+	} else if(strcasecmp(f1.name.c_str(),f2.name.c_str())<0) {
 		res = true;
 	} else {
 		res = false;
 	}
-
-	free(fn1);
-	free(fn2);
 
 	return res;
 }
@@ -214,8 +203,6 @@ void FileSelector::read_directory(void)
 		return;
 	}
 	//iprintf("%d\n", __LINE__);
-	char *filename = (char*)malloc(PATH_MAX);
-
 	DIR *dir;
 	struct stat filestats;
 	//iprintf("%d\n", __LINE__);
@@ -230,8 +217,11 @@ void FileSelector::read_directory(void)
 	if(direntry == NULL)
 	{
 		iprintf("No files found!\n");
+		closedir(dir);
 		return;
 	}
+
+	char *filename = (char*)malloc(PATH_MAX);
 	//iprintf("%d\n", __LINE__);
 	while(direntry != NULL)
 	{
@@ -309,7 +299,7 @@ void FileSelector::read_directory(void)
 	activeelement = 0;
 	scrollpos = 0;
 	//iprintf("%d\n", __LINE__);
-	filename = (char*)malloc(256);
+	filename = (char*) calloc(1, 256);
 	std::string newentry;
 	for(u16 i=0;i<filelist.size();++i) {
 		newentry = filelist.at(i).name;

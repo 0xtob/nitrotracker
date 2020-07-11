@@ -394,7 +394,7 @@ void SampleDisplay::draw(void)
 	//
 	//drawFullBox(0, 0, width, height, theme->col_dark_bg);
 	u32 colcol = theme->col_dark_bg | theme->col_dark_bg << 16;
-	for(int j=y;j<y+height;++j) dmaFillWordsDamnFast(colcol, *vram+256*j+x, width*2);
+	for(int j=y;j<y+height;++j) dmaFillWords(colcol, *vram+256*j+x, width*2);
 
 	if(active==false) {
 		drawBorder();
@@ -488,12 +488,10 @@ void SampleDisplay::draw(void)
 	for(u8 i=0; i<DRAW_HEIGHT+2; ++i)
 		colortable[i] = interpolateColor(theme->col_light_ctrl, theme->col_dark_ctrl, i);
 
-	// TODO; Eliminate floats here!!
+	int32 step = divf32(inttof32(smp->getNSamples() >> zoom_level), inttof32(width-2));
+	int32 pos = 0;
 
-	float step = (float)(smp->getNSamples() >> zoom_level) / (float)(width-2);
-	float pos = 0.0f;
-
-	u32 renderwindow = (u32)MAX(1, MIN(100, ceil(step)));
+	u32 renderwindow = (u32)MAX(1, MIN(100, ceil_f32toint(step)));
 
 	u16 middle = (DRAW_HEIGHT+2)/2;//-1;
 
@@ -505,7 +503,7 @@ void SampleDisplay::draw(void)
 
 		for(u32 i=1; i<u32(width-1); ++i)
 		{
-			data = &(base[(u32)pos]);
+			data = &(base[f32toint(pos)]);
 
 			s32 maxsmp = -32767, minsmp = 32767;
 
@@ -536,11 +534,11 @@ void SampleDisplay::draw(void)
 	} else {
 
 		s8 *data;
-		s8 *base = (s8*)smp->getData();
+		s8 *base = (s8*)smp->getData() + pixelToSample(0);
 
 		for(u32 i=1; i<u32(width-1); ++i)
 		{
-			data = &(base[(u32)pos]) + pixelToSample(0);
+			data = &(base[f32toint(pos)]);
 
 			s8 maxsmp = -127, minsmp = 127;
 
@@ -585,9 +583,11 @@ void SampleDisplay::draw(void)
 			for(u8 i=1; i<DRAW_HEIGHT+1; ++i)
 				*(*vram+SCREEN_WIDTH*(y+i)+x+loop_start_pos) = colortable[middle];
 
+			/* unused
 			u8 cutoff = 0;
 			if(loop_start_pos < 1+LOOP_TRIANGLE_SIZE)
 				cutoff = 1+LOOP_TRIANGLE_SIZE - loop_start_pos;
+			*/
 
 			// Left Triangle
 			if(loop_start_pos > 1 + LOOP_TRIANGLE_SIZE)
